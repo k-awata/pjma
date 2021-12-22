@@ -4,9 +4,13 @@ Project manager for Aveva E3D Design and Administration
 
 ## Installation
 
+If you're using Go:
+
 ```bat
-go install github.com/k-awata/pjma
+go install github.com/k-awata/pjma@latest
 ```
+
+Otherwise you can download a binary from [Releases](https://github.com/k-awata/pjma/releases).
 
 ## Usage
 
