@@ -20,12 +20,7 @@ Otherwise you can download a binary from [Releases](https://github.com/k-awata/p
   mkdir myproj
   cd myproj
   pjma init
-  ```
-
-- Run Hello world script
-
-  ```bat
-  pjma exec hello
+  pjma exec setup
   ```
 
 - Launch Administration 1.9
