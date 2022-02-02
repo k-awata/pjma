@@ -143,7 +143,11 @@ func genLaunch(path string) (string, error) {
 	buf.WriteString(" " + mdb)
 	macro := viper.GetString("context.macro")
 	if macro != "" {
-		buf.WriteString(" $m'%%projects_dir%%..\\" + macro + "'")
+		if _, err := os.Stat(macro); err == nil {
+			buf.WriteString(" $m'%%projects_dir%%..\\" + macro + "'")
+		} else {
+			buf.WriteString(" " + macro)
+		}
 	}
 	return strings.TrimSpace(buf.String()), nil
 }
