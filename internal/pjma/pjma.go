@@ -137,10 +137,12 @@ func genLaunch(path string) (string, error) {
 	buf.WriteString(" " + viper.GetString("context.project"))
 	buf.WriteString(" " + viper.GetString("context.user"))
 	mdb := viper.GetString("context.mdb")
-	if mdb != "" && !strings.HasPrefix(mdb, "/") {
-		mdb = "/" + mdb
+	if mdb != "" {
+		if !strings.HasPrefix(mdb, "/") {
+			mdb = "/" + mdb
+		}
+		buf.WriteString(" " + mdb)
 	}
-	buf.WriteString(" " + mdb)
 	macro := viper.GetString("context.macro")
 	if macro != "" {
 		if _, err := os.Stat(macro); err == nil {
