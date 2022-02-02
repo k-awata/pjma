@@ -14,6 +14,9 @@ import (
 func MakeEvars() error {
 	// Create file
 	pjdir := viper.GetString("projects_dir")
+	if _, err := os.Stat(pjdir); err != nil {
+		os.Mkdir(pjdir, 0777)
+	}
 	evars, err := os.Create(pjdir + `\custom_evars.bat`)
 	if err != nil {
 		return err
