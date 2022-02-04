@@ -28,7 +28,7 @@ var mkevarsCmd = &cobra.Command{
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
-		fmt.Println("custom_evars.bat has been updated")
+		fmt.Println(viper.GetString("projects_dir") + `\custom_evars.bat has been updated`)
 	},
 }
 
