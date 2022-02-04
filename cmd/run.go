@@ -14,11 +14,11 @@ import (
 )
 
 var runCmd = &cobra.Command{
-	Use:     "run APPNAME",
-	Short:   "Run an app defined by config file",
-	Long:    "Run an app defined by config file",
-	Example: `pjma run e3d31 -o Design -p APS -u SYSTEM/XXXXXX -d ALL -m mac/hello.mac`,
-	Args:    cobra.ExactArgs(1),
+	Use:     "run APPNAME [PJDIR]",
+	Short:   "Run a project with an app defined by config file",
+	Long:    "Run a project with an app defined by config file",
+	Example: `pjma run e3d31 -o Design -p APS -u SYSTEM/XXXXXX -d ALL`,
+	Args:    cobra.RangeArgs(1, 2),
 	Run: func(cmd *cobra.Command, args []string) {
 		appname := "apps." + args[0]
 		if !viper.IsSet(appname) {
@@ -33,6 +33,16 @@ var runCmd = &cobra.Command{
 		viper.BindPFlag("context.user", cmd.Flags().Lookup("user"))
 		viper.BindPFlag("context.mdb", cmd.Flags().Lookup("mdb"))
 		viper.BindPFlag("context.macro", cmd.Flags().Lookup("macro"))
+
+		if len(args) == 2 {
+			pjcode, err := pjma.GetProjectCode(args[1])
+			if err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return
+			}
+			viper.Set("extrapj", append(viper.GetStringSlice("extrapj"), args[1]))
+			viper.Set("context.project", pjcode)
+		}
 
 		if err := pjma.MakeEvars(); err != nil {
 			fmt.Fprintln(os.Stderr, err)

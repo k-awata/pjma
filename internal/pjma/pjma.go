@@ -24,14 +24,12 @@ func MakeEvars() error {
 	}
 	defer evars.Close()
 
-	// Output multiple paths evars
-	for _, v := range [3]string{"caf_uic_path", "pmllib", "pmlui"} {
-		_, err := evars.WriteString(dirsToEvar(v, viper.GetStringSlice(v)))
-		if err != nil {
-			return err
-		}
+	// Output local project evars
+	output, err := walkPrjDirToEvars(pjdir)
+	if err != nil {
+		return err
 	}
-	if _, err := evars.WriteString(dirsToEvar("pdmsui", viper.GetStringSlice("pmlui"))); err != nil {
+	if _, err := evars.WriteString(output); err != nil {
 		return err
 	}
 
@@ -46,12 +44,14 @@ func MakeEvars() error {
 		}
 	}
 
-	// Output local project evars
-	output, err := walkPrjDirToEvars(pjdir)
-	if err != nil {
-		return err
+	// Output multiple paths evars
+	for _, v := range [3]string{"caf_uic_path", "pmllib", "pmlui"} {
+		_, err := evars.WriteString(dirsToEvar(v, viper.GetStringSlice(v)))
+		if err != nil {
+			return err
+		}
 	}
-	if _, err := evars.WriteString(output + "\r\n"); err != nil {
+	if _, err := evars.WriteString(dirsToEvar("pdmsui", viper.GetStringSlice("pmlui")) + "\r\n"); err != nil {
 		return err
 	}
 
@@ -158,6 +158,20 @@ func genLaunch(path string) (string, error) {
 	return strings.TrimSpace(buf.String()), nil
 }
 
+func GetProjectCode(path string) (string, error) {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return "", err
+	}
+	for _, f := range files {
+		prj000 := f.Name()
+		if f.IsDir() && strings.HasSuffix(prj000, "000") {
+			return strings.TrimSuffix(prj000, "000"), nil
+		}
+	}
+	return "", errors.New("000 directory is not found in " + path)
+}
+
 func dirsToEvar(name string, dirs []string) string {
 	if len(dirs) == 0 {
 		return ""
@@ -173,38 +187,28 @@ func dirsToEvar(name string, dirs []string) string {
 }
 
 func prjDirToEvars(path string) (string, error) {
-	pjcode, err := findPrjCode(path)
+	pjdir, err := filepath.Abs(path)
 	if err != nil {
 		return "", err
 	}
-	files, err := os.ReadDir(path)
+	pjcode, err := GetProjectCode(pjdir)
+	if err != nil {
+		return "", err
+	}
+	files, err := os.ReadDir(pjdir)
 	if err != nil {
 		return "", err
 	}
 	var buf bytes.Buffer
-	buf.WriteString("\r\n")
 	for _, f := range files {
 		n := f.Name()
 		if f.IsDir() && strings.HasPrefix(n, pjcode) {
-			buf.WriteString("set " + n + "=" + filepath.Join(path, n) + "\r\n")
+			buf.WriteString("set " + n + "=" + filepath.Join(pjdir, n) + "\r\n")
 		}
 	}
-	buf.WriteString("set " + pjcode + "000id=" + filepath.Base(path) + "\r\n")
+	buf.WriteString("set " + pjcode + "000id=" + filepath.Base(pjdir) + "\r\n")
+	buf.WriteString("\r\n")
 	return buf.String(), nil
-}
-
-func findPrjCode(path string) (string, error) {
-	files, err := os.ReadDir(path)
-	if err != nil {
-		return "", err
-	}
-	for _, f := range files {
-		prj000 := f.Name()
-		if f.IsDir() && strings.HasSuffix(prj000, "000") {
-			return strings.TrimSuffix(prj000, "000"), nil
-		}
-	}
-	return "", errors.New("000 directory is not found in " + path)
 }
 
 func walkPrjDirToEvars(root string) (string, error) {
@@ -223,7 +227,6 @@ func walkPrjDirToEvars(root string) (string, error) {
 		if err != nil {
 			return err
 		}
-		buf.WriteString("\r\n")
 		for _, f := range files {
 			n := f.Name()
 			if f.IsDir() && strings.HasPrefix(n, pjcode) {
@@ -231,6 +234,7 @@ func walkPrjDirToEvars(root string) (string, error) {
 			}
 		}
 		buf.WriteString("set " + pjcode + "000id=" + filepath.Base(pjdir) + "\r\n")
+		buf.WriteString("\r\n")
 
 		return nil
 	})
