@@ -16,10 +16,11 @@ import (
 
 // execCmd represents the exec command
 var execCmd = &cobra.Command{
-	Use:   "exec SCRIPT",
-	Short: "Run a script defined by config file",
-	Long:  "Run a script defined by config file",
-	Args:  cobra.MinimumNArgs(1),
+	Use:     "exec SCRIPT",
+	Aliases: []string{"x"},
+	Short:   "Run a script defined by config file",
+	Long:    "Run a script defined by config file",
+	Args:    cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		scrname := "scripts." + args[0]
 		if !viper.IsSet(scrname) {
