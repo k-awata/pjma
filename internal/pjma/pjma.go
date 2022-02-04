@@ -2,6 +2,7 @@ package pjma
 
 import (
 	"bytes"
+	"errors"
 	"io/fs"
 	"os"
 	"os/exec"
@@ -172,24 +173,14 @@ func dirsToEvar(name string, dirs []string) string {
 }
 
 func prjDirToEvars(path string) (string, error) {
+	pjcode, err := findPrjCode(path)
+	if err != nil {
+		return "", err
+	}
 	files, err := os.ReadDir(path)
 	if err != nil {
 		return "", err
 	}
-
-	// Search 000 directory
-	pjcode := ""
-	for _, f := range files {
-		prj000 := f.Name()
-		if f.IsDir() && strings.HasSuffix(prj000, "000") {
-			pjcode = strings.TrimSuffix(prj000, "000")
-			break
-		}
-	}
-	if pjcode == "" {
-		return "", nil
-	}
-
 	var buf bytes.Buffer
 	buf.WriteString("\r\n")
 	for _, f := range files {
@@ -200,6 +191,20 @@ func prjDirToEvars(path string) (string, error) {
 	}
 	buf.WriteString("set " + pjcode + "000id=" + filepath.Base(path) + "\r\n")
 	return buf.String(), nil
+}
+
+func findPrjCode(path string) (string, error) {
+	files, err := os.ReadDir(path)
+	if err != nil {
+		return "", err
+	}
+	for _, f := range files {
+		prj000 := f.Name()
+		if f.IsDir() && strings.HasSuffix(prj000, "000") {
+			return strings.TrimSuffix(prj000, "000"), nil
+		}
+	}
+	return "", errors.New("000 directory is not found in " + path)
 }
 
 func walkPrjDirToEvars(root string) (string, error) {

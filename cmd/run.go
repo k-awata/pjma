@@ -36,9 +36,11 @@ var runCmd = &cobra.Command{
 
 		if err := pjma.MakeEvars(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			return
 		}
 		if err := pjma.Launch(); err != nil {
 			fmt.Fprintln(os.Stderr, err)
+			return
 		}
 	},
 }
