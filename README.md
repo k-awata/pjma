@@ -55,3 +55,7 @@ pjma mkbat e3d31 launch.bat
 xcopy /e C:\Users\Public\Documents\AVEVA\Projects\E3D3.1\cpl\ projects\cpl\
 pjma mkevars
 ```
+
+## License
+
+[MIT License](LICENSE)
