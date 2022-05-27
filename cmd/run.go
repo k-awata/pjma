@@ -15,6 +15,7 @@ import (
 
 var runCmd = &cobra.Command{
 	Use:     "run APPNAME [PJDIR]",
+	Aliases: []string{"r"},
 	Short:   "Run a project with an app defined by config file",
 	Long:    "Run a project with an app defined by config file",
 	Example: `pjma run e3d31 -o Design -p APS -u SYSTEM/XXXXXX -d ALL`,
