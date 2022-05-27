@@ -20,13 +20,14 @@ var mkbatCmd = &cobra.Command{
 	Example: `pjma mkbat e3d31 launch.bat`,
 	Args:    cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		appname := "apps." + args[0]
-		if !viper.IsSet(appname) {
+		// Set app name from arg
+		if !viper.IsSet("apps." + args[0]) {
 			fmt.Fprintln(os.Stderr, "app name not found in config file")
 			return
 		}
+		viper.Set("context.bat", args[0])
 
-		viper.Set("appname", appname)
+		// Set context from flags
 		viper.BindPFlag("context.module", cmd.Flags().Lookup("module"))
 		viper.BindPFlag("context.tty", cmd.Flags().Lookup("tty"))
 		viper.BindPFlag("context.project", cmd.Flags().Lookup("project"))
