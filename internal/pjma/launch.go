@@ -76,8 +76,9 @@ func genLaunch(path string) (string, error) {
 
 	var buf bytes.Buffer
 	buf.WriteString("@echo off\r\n")
+	buf.WriteString("cd /d %temp%\r\n")
 	buf.WriteString("set projects_dir=" + pjdir + "\\\r\n")
-	buf.WriteString(`start "" cmd /c "` + viper.GetString("apps."+viper.GetString("context.bat")) + `"`)
+	buf.WriteString(`start "" /wait cmd /c "` + viper.GetString("apps."+viper.GetString("context.bat")) + `"`)
 	buf.WriteString(" " + viper.GetString("context.module"))
 	if viper.GetBool("context.tty") {
 		buf.WriteString(" TTY")
