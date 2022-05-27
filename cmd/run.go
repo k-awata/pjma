@@ -21,13 +21,14 @@ var runCmd = &cobra.Command{
 	Example: `pjma run e3d31 -o Design -p APS -u SYSTEM/XXXXXX -d ALL`,
 	Args:    cobra.RangeArgs(1, 2),
 	Run: func(cmd *cobra.Command, args []string) {
-		appname := "apps." + args[0]
-		if !viper.IsSet(appname) {
+		// Set app name from 1st arg
+		if !viper.IsSet("apps." + args[0]) {
 			fmt.Fprintln(os.Stderr, "app name not found in config file")
 			return
 		}
+		viper.Set("context.bat", args[0])
 
-		viper.Set("appname", appname)
+		// Set context from flags
 		viper.BindPFlag("context.module", cmd.Flags().Lookup("module"))
 		viper.BindPFlag("context.tty", cmd.Flags().Lookup("tty"))
 		viper.BindPFlag("context.project", cmd.Flags().Lookup("project"))
@@ -35,6 +36,7 @@ var runCmd = &cobra.Command{
 		viper.BindPFlag("context.mdb", cmd.Flags().Lookup("mdb"))
 		viper.BindPFlag("context.macro", cmd.Flags().Lookup("macro"))
 
+		// Directly open project by path from 2nd arg
 		if len(args) == 2 {
 			pjcode, err := pjma.GetProjectCode(args[1])
 			if err != nil {
