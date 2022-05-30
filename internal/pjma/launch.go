@@ -19,7 +19,7 @@ func Launch() error {
 		launch.Close()
 		os.Remove(launch.Name())
 	}()
-	buf, err := genLaunch("")
+	buf, err := genLaunch(true)
 	if err != nil {
 		return err
 	}
@@ -38,11 +38,7 @@ func MakeLaunch(path string) error {
 		return err
 	}
 	defer launch.Close()
-	dir := ""
-	if !viper.GetBool("absbat") {
-		dir = filepath.Dir(path)
-	}
-	buf, err := genLaunch(dir)
+	buf, err := genLaunch(viper.GetBool("absbat"))
 	if err != nil {
 		return err
 	}
@@ -52,32 +48,19 @@ func MakeLaunch(path string) error {
 	return nil
 }
 
-func genLaunch(path string) (string, error) {
-	pjdir, err := filepath.Abs(viper.GetString("projects_dir"))
+func genLaunch(abs bool) (string, error) {
+	pjrel := viper.GetString("projects_dir")
+	pjdir, err := filepath.Abs(pjrel)
 	if err != nil {
 		return "", err
 	}
-	if path != "" {
-		// Set relative path
-		base, err := filepath.Abs(path)
-		if err != nil {
-			return "", err
-		}
-		pwd, err := os.Getwd()
-		if err != nil {
-			return "", err
-		}
-		reldir, err := filepath.Rel(base, pwd)
-		if err != nil {
-			return "", err
-		}
-		pjdir = "%~dp0" + filepath.Join(reldir, viper.GetString("projects_dir"))
+	if !abs && !filepath.IsAbs(pjrel) {
+		pjdir = "%cd%\\" + pjrel
 	}
-
 	var buf bytes.Buffer
 	buf.WriteString("@echo off\r\n")
-	buf.WriteString("cd /d %temp%\r\n")
 	buf.WriteString("set projects_dir=" + pjdir + "\\\r\n")
+	buf.WriteString("cd /d \"%temp%\"\r\n")
 	buf.WriteString(`start "" /wait cmd /c "` + viper.GetString("apps."+viper.GetString("context.bat")) + `"`)
 	buf.WriteString(" " + viper.GetString("context.module"))
 	if viper.GetBool("context.tty") {
@@ -100,5 +83,5 @@ func genLaunch(path string) (string, error) {
 			buf.WriteString(" " + macro)
 		}
 	}
-	return strings.TrimSpace(buf.String()), nil
+	return strings.TrimSpace(buf.String()) + "\r\n", nil
 }
