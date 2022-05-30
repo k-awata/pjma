@@ -21,8 +21,17 @@ var execCmd = &cobra.Command{
 	Aliases: []string{"x"},
 	Short:   "Run a script defined by config file",
 	Long:    "Run a script defined by config file",
-	Args:    cobra.MinimumNArgs(1),
+	Args:    cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			fmt.Println("Available Scripts:")
+			scr := viper.GetStringMapString("scripts")
+			for _, v := range pjma.StringMapKeysToSlice(viper.GetStringMap("scripts")) {
+				fmt.Println("  " + v)
+				fmt.Println("    " + scr[v])
+			}
+			return
+		}
 		scrname := "scripts." + args[0]
 		if !viper.IsSet(scrname) {
 			fmt.Fprintln(os.Stderr, "script name not found in config file")

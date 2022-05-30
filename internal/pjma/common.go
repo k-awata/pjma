@@ -2,7 +2,17 @@ package pjma
 
 import (
 	"bytes"
+	"sort"
 )
+
+func StringMapKeysToSlice(m map[string]interface{}) []string {
+	keys := []string{}
+	for k := range m {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	return keys
+}
 
 func ParseScript(scr string) []string {
 	var buf bytes.Buffer
