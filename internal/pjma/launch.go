@@ -66,21 +66,25 @@ func genLaunch(abs bool) (string, error) {
 	if viper.GetBool("context.tty") {
 		buf.WriteString(" TTY")
 	}
-	buf.WriteString(" " + viper.GetString("context.project"))
-	buf.WriteString(" " + viper.GetString("context.user"))
-	mdb := viper.GetString("context.mdb")
-	if mdb != "" {
-		if !strings.HasPrefix(mdb, "/") {
-			mdb = "/" + mdb
+	proj := viper.GetString("context.project")
+	user := viper.GetString("context.user")
+	if proj != "" && user != "" {
+		buf.WriteString(" " + viper.GetString("context.project"))
+		buf.WriteString(" " + viper.GetString("context.user"))
+		mdb := viper.GetString("context.mdb")
+		if mdb != "" {
+			if !strings.HasPrefix(mdb, "/") {
+				mdb = "/" + mdb
+			}
+			buf.WriteString(" " + mdb)
 		}
-		buf.WriteString(" " + mdb)
-	}
-	macro := viper.GetString("context.macro")
-	if macro != "" {
-		if _, err := os.Stat(macro); err == nil {
-			buf.WriteString(" $m'%%projects_dir%%..\\" + macro + "'")
-		} else {
-			buf.WriteString(" " + macro)
+		macro := viper.GetString("context.macro")
+		if macro != "" {
+			if _, err := os.Stat(macro); err == nil {
+				buf.WriteString(" $m'%%projects_dir%%..\\" + macro + "'")
+			} else {
+				buf.WriteString(" " + macro)
+			}
 		}
 	}
 	return strings.TrimSpace(buf.String()) + "\r\n", nil
