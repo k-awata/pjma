@@ -43,10 +43,10 @@ myproj
 pjma run adm19
 ```
 
-### Make a bat file to launch an app
+### Make a Windows batch file to launch an app
 
 ```bat
-pjma mkbat e3d31 launch.bat
+pjma mkbat e3d31 > launch.bat
 ```
 
 ### Add an existing project

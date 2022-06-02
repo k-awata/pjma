@@ -19,7 +19,7 @@ func Launch() error {
 		launch.Close()
 		os.Remove(launch.Name())
 	}()
-	buf, err := genLaunch(true)
+	buf, err := MakeLaunch(true)
 	if err != nil {
 		return err
 	}
@@ -32,23 +32,7 @@ func Launch() error {
 	return nil
 }
 
-func MakeLaunch(path string) error {
-	launch, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer launch.Close()
-	buf, err := genLaunch(viper.GetBool("absbat"))
-	if err != nil {
-		return err
-	}
-	if _, err := launch.WriteString(buf); err != nil {
-		return err
-	}
-	return nil
-}
-
-func genLaunch(abs bool) (string, error) {
+func MakeLaunch(abs bool) (string, error) {
 	pjrel := viper.GetString("projects_dir")
 	pjdir, err := filepath.Abs(pjrel)
 	if err != nil {

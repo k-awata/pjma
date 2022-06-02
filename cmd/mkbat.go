@@ -14,11 +14,11 @@ import (
 )
 
 var mkbatCmd = &cobra.Command{
-	Use:     "mkbat APPNAME BATFILE",
+	Use:     "mkbat APPNAME",
 	Short:   "Make a batch file to run specified app",
 	Long:    "Make a batch file to run specified app",
-	Example: `pjma mkbat e3d31 launch.bat`,
-	Args:    cobra.ExactArgs(2),
+	Example: `pjma mkbat e3d31 > launch.bat`,
+	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		// Set app name from arg
 		if !viper.IsSet("apps." + args[0]) {
@@ -36,11 +36,12 @@ var mkbatCmd = &cobra.Command{
 		viper.BindPFlag("context.macro", cmd.Flags().Lookup("macro"))
 		viper.BindPFlag("absbat", cmd.Flags().Lookup("abs"))
 
-		if err := pjma.MakeLaunch(args[1]); err != nil {
+		bat, err := pjma.MakeLaunch(viper.GetBool("absbat"))
+		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			return
 		}
-		fmt.Println("batch file created at " + args[1])
+		fmt.Print(bat)
 	},
 }
 
