@@ -1,6 +1,6 @@
 # pjma
 
-Project manager for Aveva E3D Design and Administration
+pjma is a project manager for Aveva E3D Design and Administration. It manages the environment to launch E3D Design in one specified directory.
 
 ## Installation
 
@@ -16,26 +16,26 @@ Otherwise, you can download a binary from [Releases](https://github.com/k-awata/
 
 ### Create a project directory
 
-Command:
+- Command:
 
-```bat
-mkdir myproj
-cd myproj
-pjma init
-pjma exec setup
-```
+  ```bat
+  mkdir myproj
+  cd myproj
+  pjma init
+  pjma exec setup
+  ```
 
-Result:
+- Result:
 
-```bash
-myproj
-    │  pjmaconf.yaml  # pjma config file
-    │
-    ├─cafuic    # to store UI customization files
-    ├─pmllib    # to store PML2 macros
-    ├─pmlui     # to store PML1 macros
-    └─projects  # to store E3D project folders
-```
+  ```bash
+  myproj
+      │  pjmaconf.yaml  # pjma config file
+      │
+      ├─cafuic    # to store UI customization files
+      ├─pmllib    # to store PML2 macros
+      ├─pmlui     # to store PML1 macros
+      └─projects  # to store E3D project folders
+  ```
 
 ### Launch an app
 
@@ -52,7 +52,7 @@ pjma mkbat e3d31 > launch.bat
 ### Add an existing project
 
 ```bat
-xcopy /e C:\Users\Public\Documents\AVEVA\Projects\E3D3.1\cpl\ projects\cpl\
+xcopy /e C:\Users\Public\Documents\AVEVA\Projects\E3D3.1\cpl\ .\projects\cpl\
 pjma mkevars
 ```
 
