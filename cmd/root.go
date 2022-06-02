@@ -20,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Use:     "pjma",
 	Short:   "Project manager for Aveva E3D Design and Administration",
 	Long:    "Project manager for Aveva E3D Design and Administration",
-	Version: "0.5.1",
+	Version: "0.6.0",
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
