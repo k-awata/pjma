@@ -45,7 +45,9 @@ func MakeLaunch(abs bool) (string, error) {
 	buf.WriteString("@echo off\r\n")
 	buf.WriteString("set projects_dir=" + pjdir + "\\\r\n")
 	buf.WriteString("cd /d \"%temp%\"\r\n")
-	buf.WriteString(`start "" /wait cmd /c "` + viper.GetString("apps."+viper.GetString("context.bat")) + `"`)
+	appname := viper.GetString("context.bat")
+	buf.WriteString("echo Running app " + appname + "...\r\n")
+	buf.WriteString(`start "" /wait cmd /c "` + viper.GetString("apps."+appname) + `"`)
 	module := strings.TrimSpace(viper.GetString("context.module"))
 	if module != "" {
 		buf.WriteString(" " + module)
