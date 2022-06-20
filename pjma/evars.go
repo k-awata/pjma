@@ -63,14 +63,6 @@ func (e *Evars) Save() error {
 	if e.pjdir == "" {
 		return errors.New("projects_dir is not specified")
 	}
-	// Make commands
-	l, err := e.makeProjectsDir()
-	if err != nil {
-		return err
-	}
-	f := e.makeReferProjects()
-	j := e.makeJoinEnv()
-	a := e.acmd
 	// Make directory if it doesn't exist
 	if fs, err := os.Stat(e.pjdir); err != nil {
 		if err := os.MkdirAll(e.pjdir, os.ModePerm); err != nil {
@@ -79,6 +71,14 @@ func (e *Evars) Save() error {
 	} else if !fs.IsDir() {
 		return errors.New("projects_dir is not a directory")
 	}
+	// Make commands
+	l, err := e.makeProjectsDir()
+	if err != nil {
+		return err
+	}
+	f := e.makeReferProjects()
+	j := e.makeJoinEnv()
+	a := e.acmd
 	// Create custom evars
 	file, err := os.Create(filepath.Join(e.pjdir, CUSTOM_EVARS))
 	if err != nil {
