@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/viper v1.12.0
+	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467
 )
 
 require (

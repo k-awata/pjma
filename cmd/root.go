@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 K.Awata
+Copyright © 2022 K.Awata
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,25 +22,46 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"strings"
 
+	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-const defaultconf = "pjmaconf.yaml"
-
-var cfgFile string
+// var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:     "pjma",
+	Use: `pjma script_name [args]...
+  pjma`,
 	Short:   "Project manager for Aveva E3D Design and Administration",
-	Long:    "Project manager for Aveva E3D Design and Administration",
-	Version: "0.6.2",
+	Version: "1.0.0",
+	Args:    cobra.MinimumNArgs(0),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		if len(args) == 0 {
+			cmd.Help()
+			return
+		}
+
+		scrkey := "scripts." + args[0]
+		if !viper.IsSet(scrkey) {
+			cobra.CheckErr(fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath()))
+		}
+		scrval := append(pjma.ParseCommand(viper.GetString(scrkey)), args[1:]...)
+		cmd.Println("> " + strings.Join(scrval, " "))
+		out, err := exec.Command(scrval[0], scrval[1:]...).Output()
+		cobra.CheckErr(err)
+		if len(out) > 0 {
+			cmd.Print(string(out))
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -54,18 +75,73 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./"+defaultconf+")")
+
+	// Here you will define your flags and configuration settings.
+	// Cobra supports persistent flags, which, if defined here,
+	// will be global for your application.
+
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./pjma.yaml)")
+
+	// Cobra also supports local flags, which will only run
+	// when this action is called directly.
+	// rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
-	if cfgFile != "" {
-		viper.SetConfigFile(cfgFile)
-	} else {
-		viper.AddConfigPath(".")
-		viper.AddConfigPath("$HOME")
-		viper.SetConfigType("yaml")
-		viper.SetConfigName("pjmaconf")
+	// if cfgFile != "" {
+	// 	// Use config file from the flag.
+	// 	viper.SetConfigFile(cfgFile)
+	// } else {
+	// 	// Find home directory.
+	// 	home, err := os.UserHomeDir()
+	// 	cobra.CheckErr(err)
+
+	// 	// Search config in home directory with name ".pjma" (without extension).
+	// 	viper.AddConfigPath(home)
+	// 	viper.SetConfigType("yaml")
+	// 	viper.SetConfigName(".pjma")
+	// }
+
+	// viper.AutomaticEnv() // read in environment variables that match
+
+	// // If a config file is found, read it in.
+	// if err := viper.ReadInConfig(); err == nil {
+	// 	fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+	// }
+
+	// Find home directory.
+	g := viper.New()
+	home, err := os.UserHomeDir()
+	if err == nil {
+		g.AddConfigPath(filepath.Join(home, ".pjma"))
+		g.SetConfigType("yaml")
+		g.SetConfigName("pjma")
+		g.ReadInConfig()
 	}
-	viper.ReadInConfig()
+
+	// Find current directory.
+	wd, err := os.Getwd()
+	cobra.CheckErr(err)
+	viper.AddConfigPath(wd)
+	viper.SetConfigType("yaml")
+	viper.SetConfigName("pjma")
+	viper.AutomaticEnv() // read in environment variables that match
+	if err := viper.ReadInConfig(); err == nil {
+		viper.Set("apps", pjma.MergeStringMaps(viper.GetStringMap("apps"), g.GetStringMap("apps")))
+		viper.Set("scripts", pjma.MergeStringMaps(viper.GetStringMap("scripts"), g.GetStringMap("scripts")))
+		viper.SetDefault("context", pjma.MergeStringMaps(viper.GetStringMap("context"), g.GetStringMap("context")))
+	} else {
+		viper.MergeConfigMap(g.AllSettings())
+	}
+}
+
+func bindContextFlags(cmd *cobra.Command) {
+	viper.BindPFlag("context.module", cmd.Flags().Lookup("module"))
+	viper.BindPFlag("context.tty", cmd.Flags().Lookup("tty"))
+	viper.BindPFlag("context.project", cmd.Flags().Lookup("project"))
+	viper.BindPFlag("context.user", cmd.Flags().Lookup("user"))
+	viper.BindPFlag("context.password", cmd.Flags().Lookup("password"))
+	viper.BindPFlag("context.mdb", cmd.Flags().Lookup("mdb"))
+	viper.BindPFlag("context.macro", cmd.Flags().Lookup("macro"))
 }

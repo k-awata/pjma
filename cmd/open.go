@@ -22,25 +22,51 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"strings"
+	"os"
+	"syscall"
 
 	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"golang.org/x/term"
 )
 
-// mkbatCmd represents the mkbat command
-var mkbatCmd = &cobra.Command{
-	Use:     "mkbat app_name",
-	Short:   "Output bat file commands to launch an app",
-	Example: `  pjma mkbat e3d > launch.bat`,
+// openCmd represents the open command
+var openCmd = &cobra.Command{
+	Use:     "open app_name",
+	Aliases: []string{"o"},
+	Short:   "Open an app defined by pjma.yaml",
+	Example: `  pjma open e3d -e Design -P APS -u SYSTEM -p XXXXXX -M ALL`,
 	Args:    cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		bindContextFlags(cmd)
 		batkey := "apps." + args[0]
 		if !viper.IsSet(batkey) {
 			cobra.CheckErr("pjma cannot find bat name: " + args[0])
+		}
+
+		// Save custom_evars.bat
+		evars := pjma.NewEvars(viper.GetString("projects_dir"))
+		cobra.CheckErr(evars.AddReferProjectDirs(viper.GetStringSlice("refer_pj")))
+		evars.AddJoinEnv(viper.GetStringMapStringSlice("join_env"))
+		evars.AddAfterCmd(viper.GetString("after_cmd"))
+
+		// Add reference project if given as directory path
+		fs, err := os.Stat(viper.GetString("context.project"))
+		if err == nil && fs.IsDir() {
+			pj, err := pjma.NewProject("", viper.GetString("context.project"))
+			cobra.CheckErr(err)
+			viper.Set("context.project", pj.Code())
+			evars.AddReferProject(*pj)
+		}
+
+		// If password isn't specified, ask user it with blind
+		if viper.GetString("context.user") != "" && viper.GetString("context.password") == "" {
+			cmd.Print("Enter password: ")
+			p, err := term.ReadPassword(int(syscall.Stdin))
+			cobra.CheckErr(err)
+			viper.Set("context.password", string(p))
+			cmd.Println()
 		}
 
 		lnchr := pjma.NewLauncher(viper.GetString("projects_dir"), viper.GetString(batkey)).
@@ -51,28 +77,30 @@ var mkbatCmd = &cobra.Command{
 			SetMdb(viper.GetString("context.mdb")).
 			SetMacro(viper.GetString("context.macro"))
 
-		fmt.Print(strings.ReplaceAll(lnchr.MakeBat(), "\n", "\r\n"))
+		cobra.CheckErr(evars.Save())
+		cmd.Println("Running app " + args[0] + "...")
+		cobra.CheckErr(lnchr.Run())
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(mkbatCmd)
+	rootCmd.AddCommand(openCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
 	// and all subcommands, e.g.:
-	// mkbatCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// openCmd.PersistentFlags().String("foo", "", "A help for foo")
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// mkbatCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// openCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	mkbatCmd.Flags().StringP("module", "e", "", "module to enter")
-	mkbatCmd.Flags().BoolP("tty", "t", false, "launch with no gui mode")
-	mkbatCmd.Flags().StringP("project", "P", "", "project code")
-	mkbatCmd.Flags().StringP("user", "u", "", "username")
-	mkbatCmd.Flags().StringP("password", "p", "", "password")
-	mkbatCmd.Flags().StringP("mdb", "M", "", "MDB name")
-	mkbatCmd.Flags().StringP("macro", "m", "", "macro file")
+	openCmd.Flags().StringP("module", "e", "", "module to enter")
+	openCmd.Flags().BoolP("tty", "t", false, "launch with no gui mode")
+	openCmd.Flags().StringP("project", "P", "", "project code or dir")
+	openCmd.Flags().StringP("user", "u", "", "username")
+	openCmd.Flags().StringP("password", "p", "", "password")
+	openCmd.Flags().StringP("mdb", "M", "", "MDB name")
+	openCmd.Flags().StringP("macro", "m", "", "macro file")
 }

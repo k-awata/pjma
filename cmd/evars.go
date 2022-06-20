@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 K.Awata
+Copyright © 2022 K.Awata
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,50 +22,36 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"os/exec"
-	"strings"
-
-	"github.com/k-awata/pjma/internal/pjma"
+	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
-// execCmd represents the exec command
-var execCmd = &cobra.Command{
-	Use:     "exec SCRIPT",
-	Aliases: []string{"x"},
-	Short:   "Run a script defined by config file",
-	Long:    "Run a script defined by config file",
-	Args:    cobra.MinimumNArgs(0),
+// evarsCmd represents the evars command
+var evarsCmd = &cobra.Command{
+	Use:   "evars",
+	Short: "Update custom_evars.bat in projects_dir",
+	Args:  cobra.ExactArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 0 {
-			fmt.Println("Available Scripts:")
-			scr := viper.GetStringMapString("scripts")
-			for _, v := range pjma.StringMapKeysToSlice(viper.GetStringMap("scripts")) {
-				fmt.Println("  " + v)
-				fmt.Println("    " + scr[v])
-			}
-			return
-		}
-		scrname := "scripts." + args[0]
-		if !viper.IsSet(scrname) {
-			fmt.Fprintln(os.Stderr, "script name not found in config file")
-			return
-		}
-		scr := append(pjma.ParseScript(viper.GetString(scrname)), args[1:]...)
-		fmt.Println("> " + strings.Join(scr, " "))
-		out, err := exec.Command(scr[0], scr[1:]...).Output()
-		if err != nil {
-			fmt.Fprintln(os.Stderr, err)
-		}
-		if len(out) > 0 {
-			fmt.Print(string(out))
-		}
+		evars := pjma.NewEvars(viper.GetString("projects_dir"))
+		cobra.CheckErr(evars.AddReferProjectDirs(viper.GetStringSlice("refer_pj")))
+		evars.AddJoinEnv(viper.GetStringMapStringSlice("join_env"))
+		evars.AddAfterCmd(viper.GetString("after_cmd"))
+		cobra.CheckErr(evars.Save())
+		cmd.Println("pjma updated custom_evars.bat in projects_dir")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(execCmd)
+	rootCmd.AddCommand(evarsCmd)
+
+	// Here you will define your flags and configuration settings.
+
+	// Cobra supports Persistent Flags which will work for this command
+	// and all subcommands, e.g.:
+	// evarsCmd.PersistentFlags().String("foo", "", "A help for foo")
+
+	// Cobra supports local flags which will only run when this command
+	// is called directly, e.g.:
+	// evarsCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
