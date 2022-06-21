@@ -19,8 +19,8 @@ type Project struct {
 // NewProject returns project from directory path
 func NewProject(root string, path string) (*Project, error) {
 	p := &Project{
-		root: root,
-		path: path,
+		root: os.ExpandEnv(root),
+		path: os.ExpandEnv(path),
 	}
 	if err := p.loadEvars(); err != nil {
 		return nil, err

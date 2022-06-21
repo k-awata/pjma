@@ -22,8 +22,8 @@ type Launcher struct {
 // NewLauncher returns a new launcher
 func NewLauncher(pjdir string, bat string) *Launcher {
 	return &Launcher{
-		pjdir: pjdir,
-		bat:   bat,
+		pjdir: os.ExpandEnv(pjdir),
+		bat:   os.ExpandEnv(bat),
 	}
 }
 

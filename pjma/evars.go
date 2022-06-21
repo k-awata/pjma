@@ -22,7 +22,7 @@ type Evars struct {
 // NewProject returns evars
 func NewEvars(pjdir string) *Evars {
 	return &Evars{
-		pjdir: pjdir,
+		pjdir: os.ExpandEnv(pjdir),
 		jenv:  map[string][]string{},
 	}
 }
@@ -125,7 +125,8 @@ func (e *Evars) makeJoinEnv() string {
 	var buf bytes.Buffer
 	for _, k := range SortStringKeys(e.jenv) {
 		buf.WriteString("set " + k + "=")
-		for _, p := range e.jenv[k] {
+		for _, v := range e.jenv[k] {
+			p := os.ExpandEnv(v)
 			if filepath.IsAbs(p) {
 				buf.WriteString(p + ";")
 			} else {

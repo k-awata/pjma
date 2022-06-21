@@ -40,7 +40,7 @@ var rootCmd = &cobra.Command{
 	Use: `pjma script_name [args]...
   pjma`,
 	Short:   "Project manager for Aveva E3D Design and Administration",
-	Version: "1.0.1",
+	Version: "1.0.2",
 	Args:    cobra.MinimumNArgs(0),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
