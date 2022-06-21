@@ -93,7 +93,7 @@ func (l *Launcher) MakeBat() string {
 	} else {
 		buf.WriteString("set " + PROJECTS_DIR + `=%cd%\` + l.pjdir + "\n")
 	}
-	buf.WriteString(`start "" /wait cmd /c "` + l.bat + `"`)
+	buf.WriteString(`start "pjma open" /wait cmd /c "` + l.bat + `"`)
 	if l.mod != "" {
 		buf.WriteString(" " + l.mod)
 	}
