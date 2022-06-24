@@ -11,13 +11,13 @@ apps:
   adm: C:\Program Files (x86)\AVEVA\Administration1.9\admin.bat
   new: C:\Program Files (x86)\AVEVA\Administration1.9\projectcreation.bat
 context:
-  module: ""
-  tty: false
-  project: ""
-  user: ""
-  password: ""
-  mdb: ""
-  macro: ""
+  # module: ""
+  # tty: false
+  # project: ""
+  # user: ""
+  # password: ""
+  # mdb: ""
+  # macro: ""
 projects_dir: projects\
 refer_pj:
   - C:\Users\Public\Documents\AVEVA\Projects\E3D3.1\AvevaCatalogue
@@ -33,7 +33,7 @@ join_env:
 after_cmd: |
   cd /d %temp%
 scripts:
-  setup: cmd /c "mkdir projects cafuic pmllib pmlui"
+  setup: cmd /c mkdir projects cafuic pmllib pmlui
 `
 
 // SortStringKeys returns sorted keys from string map
