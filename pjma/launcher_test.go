@@ -15,7 +15,6 @@ func TestLauncher_SetMdb(t *testing.T) {
 		args args
 		want *Launcher
 	}{
-		// TODO: Add test cases.
 		{"Empty", &Launcher{}, args{""}, &Launcher{}},
 		{"No slash", &Launcher{}, args{"MDB"}, &Launcher{mdb: "/MDB"}},
 		{"slash", &Launcher{}, args{"/MDB"}, &Launcher{mdb: "/MDB"}},

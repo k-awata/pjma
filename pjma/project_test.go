@@ -8,7 +8,6 @@ func TestProject_DumpEvars(t *testing.T) {
 		p    *Project
 		want string
 	}{
-		// TODO: Add test cases.
 		{
 			"test",
 			&Project{

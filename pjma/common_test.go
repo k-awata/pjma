@@ -14,7 +14,6 @@ func TestParseCommand(t *testing.T) {
 		args args
 		want []string
 	}{
-		// TODO: Add test cases.
 		{"normal", args{`cmd /c arg root\path\file`}, []string{`cmd`, `/c`, `arg`, `root\path\file`}},
 		{"quote", args{`cmd /c "arg root\path\file"`}, []string{`cmd`, `/c`, `arg root\path\file`}},
 		{"single in double", args{`cmd /c "arg 'root\test path\file'"`}, []string{`cmd`, `/c`, `arg 'root\test path\file'`}},

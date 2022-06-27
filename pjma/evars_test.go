@@ -8,7 +8,6 @@ func TestEvars_makeJoinEnv(t *testing.T) {
 		e    *Evars
 		want string
 	}{
-		// TODO: Add test cases.
 		{
 			"join env",
 			&Evars{
