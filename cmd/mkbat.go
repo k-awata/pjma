@@ -43,7 +43,7 @@ var mkbatCmd = &cobra.Command{
 			cobra.CheckErr("pjma cannot find bat name: " + args[0])
 		}
 
-		lnchr := pjma.NewLauncher(viper.GetString("projects_dir"), viper.GetString(batkey)).
+		lnchr := pjma.NewLauncher(viper.GetString("projects_dir"), viper.GetString(batkey), args[0]).
 			SetModule(viper.GetString("context.module")).
 			SetTty(viper.GetBool("context.tty")).
 			SetProject(viper.GetString("context.project")).

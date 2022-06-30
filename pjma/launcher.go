@@ -11,6 +11,7 @@ import (
 type Launcher struct {
 	pjdir string
 	bat   string
+	title string
 	mod   string
 	tty   string
 	pj    string
@@ -20,10 +21,11 @@ type Launcher struct {
 }
 
 // NewLauncher returns a new launcher
-func NewLauncher(pjdir string, bat string) *Launcher {
+func NewLauncher(pjdir string, bat string, title string) *Launcher {
 	return &Launcher{
 		pjdir: os.ExpandEnv(pjdir),
 		bat:   os.ExpandEnv(bat),
+		title: title,
 	}
 }
 
@@ -93,7 +95,7 @@ func (l *Launcher) MakeBat() string {
 	} else {
 		buf.WriteString("set " + PROJECTS_DIR + `=%cd%\` + l.pjdir + "\n")
 	}
-	buf.WriteString(`start "pjma open" /wait cmd /c "` + l.bat + `"`)
+	buf.WriteString(`start "` + l.title + `" /wait cmd /c "` + l.bat + `"`)
 	if l.mod != "" {
 		buf.WriteString(" " + l.mod)
 	}
