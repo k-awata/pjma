@@ -9,25 +9,69 @@ func TestProject_DumpEvars(t *testing.T) {
 		want string
 	}{
 		{
-			"test",
+			"pjdir",
 			&Project{
 				`c:\root\projects`,
-				`c:\root\projects\TestProject`,
-				"tst",
+				`c:\root\projects\AAAProject`,
+				"aaa",
 				[]string{
-					`TestProject\tst000`,
-					`TestProject\tstdflts`,
-					`TestProject\tstiso`,
-					`TestProject\tstmac`,
-					`TestProject\tstpic`,
+					`AAAProject\aaa000`,
+					`AAAProject\aaadflts`,
+					`AAAProject\aaaiso`,
+					`AAAProject\aaamac`,
+					`AAAProject\aaapic`,
 				},
 			},
-			`set tst000=%projects_dir%\TestProject\tst000
-set tstdflts=%projects_dir%\TestProject\tstdflts
-set tstiso=%projects_dir%\TestProject\tstiso
-set tstmac=%projects_dir%\TestProject\tstmac
-set tstpic=%projects_dir%\TestProject\tstpic
-set tst000id=TestProject
+			`set aaa000=%projects_dir%\AAAProject\aaa000
+set aaadflts=%projects_dir%\AAAProject\aaadflts
+set aaaiso=%projects_dir%\AAAProject\aaaiso
+set aaamac=%projects_dir%\AAAProject\aaamac
+set aaapic=%projects_dir%\AAAProject\aaapic
+set aaa000id=AAAProject
+`,
+		},
+		{
+			"abs",
+			&Project{
+				``,
+				`c:\root\projects\BBBProject`,
+				"bbb",
+				[]string{
+					`c:\root\projects\BBBProject\bbb000`,
+					`c:\root\projects\BBBProject\bbbdflts`,
+					`c:\root\projects\BBBProject\bbbiso`,
+					`c:\root\projects\BBBProject\bbbmac`,
+					`c:\root\projects\BBBProject\bbbpic`,
+				},
+			},
+			`set bbb000=c:\root\projects\BBBProject\bbb000
+set bbbdflts=c:\root\projects\BBBProject\bbbdflts
+set bbbiso=c:\root\projects\BBBProject\bbbiso
+set bbbmac=c:\root\projects\BBBProject\bbbmac
+set bbbpic=c:\root\projects\BBBProject\bbbpic
+set bbb000id=BBBProject
+`,
+		},
+		{
+			"rel",
+			&Project{
+				``,
+				`projects\CCCProject`,
+				"ccc",
+				[]string{
+					`projects\CCCProject\ccc000`,
+					`projects\CCCProject\cccdflts`,
+					`projects\CCCProject\ccciso`,
+					`projects\CCCProject\cccmac`,
+					`projects\CCCProject\cccpic`,
+				},
+			},
+			`set ccc000=%cd%\projects\CCCProject\ccc000
+set cccdflts=%cd%\projects\CCCProject\cccdflts
+set ccciso=%cd%\projects\CCCProject\ccciso
+set cccmac=%cd%\projects\CCCProject\cccmac
+set cccpic=%cd%\projects\CCCProject\cccpic
+set ccc000id=CCCProject
 `,
 		},
 	}

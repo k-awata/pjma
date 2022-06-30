@@ -9,29 +9,29 @@ func TestEvars_makeJoinEnv(t *testing.T) {
 		want string
 	}{
 		{
-			"join env",
+			"test",
 			&Evars{
 				jenv: map[string][]string{
 					"caf_uic_path": {
-						`c:\cafuic_1`,
-						`c:\cafuic_2`,
-						`c:\cafuic_3`,
+						`c:\root\cafuic_1`,
+						`c:\root\cafuic_2`,
+						`cafuic_3`,
 					},
 					"pmllib": {
-						`c:\pmllib_1`,
-						`c:\pmllib_2`,
-						`c:\pmllib_3`,
+						`c:\root\pmllib_1`,
+						`c:\root\pmllib_2`,
+						`pmllib_3`,
 					},
 					"pmlui": {
-						`c:\pmlui_1`,
-						`c:\pmlui_2`,
-						`c:\pmlui_3`,
+						`c:\root\pmlui_1`,
+						`c:\root\pmlui_2`,
+						`pmlui_3`,
 					},
 				},
 			},
-			`set caf_uic_path=c:\cafuic_1;c:\cafuic_2;c:\cafuic_3;%caf_uic_path%
-set pmllib=c:\pmllib_1;c:\pmllib_2;c:\pmllib_3;%pmllib%
-set pmlui=c:\pmlui_1;c:\pmlui_2;c:\pmlui_3;%pmlui%
+			`set caf_uic_path=c:\root\cafuic_1;c:\root\cafuic_2;%cd%\cafuic_3;%caf_uic_path%
+set pmllib=c:\root\pmllib_1;c:\root\pmllib_2;%cd%\pmllib_3;%pmllib%
+set pmlui=c:\root\pmlui_1;c:\root\pmlui_2;%cd%\pmlui_3;%pmlui%
 
 `,
 		},
