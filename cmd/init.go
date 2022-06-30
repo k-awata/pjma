@@ -22,11 +22,14 @@ THE SOFTWARE.
 package cmd
 
 import (
+	_ "embed"
 	"os"
 
-	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
 )
+
+//go:embed init.yaml
+var inityaml string
 
 // initCmd represents the init command
 var initCmd = &cobra.Command{
@@ -41,7 +44,7 @@ var initCmd = &cobra.Command{
 		f, err := os.Create("pjma.yaml")
 		cobra.CheckErr(err)
 		defer f.Close()
-		_, err = f.WriteString(pjma.DefaultEnv)
+		_, err = f.WriteString(inityaml)
 		cobra.CheckErr(err)
 		cmd.Println("pjma created pjma.yaml to current directory")
 	},
