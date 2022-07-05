@@ -40,7 +40,7 @@ var rootCmd = &cobra.Command{
 	Use: `pjma script_name [args]...
   pjma`,
 	Short:   "Project manager for Aveva E3D Design and Administration",
-	Version: "1.0.5",
+	Version: "1.0.6",
 	Args:    cobra.MinimumNArgs(0),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -55,12 +55,13 @@ var rootCmd = &cobra.Command{
 			cobra.CheckErr(fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath()))
 		}
 		scrval := append(pjma.ParseCommand(viper.GetString(scrkey)), args[1:]...)
+
+		e := exec.Command(scrval[0], scrval[1:]...)
+		e.Stdin = os.Stdin
+		e.Stdout = os.Stdout
+		e.Stderr = os.Stderr
 		cmd.Println("> " + strings.Join(scrval, " "))
-		out, err := exec.Command(scrval[0], scrval[1:]...).CombinedOutput()
-		cobra.CheckErr(err)
-		if len(out) > 0 {
-			cmd.Print(string(out))
-		}
+		cobra.CheckErr(e.Run())
 	},
 }
 
