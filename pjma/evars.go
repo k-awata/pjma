@@ -101,6 +101,7 @@ func (e *Evars) makeReferProjects() string {
 
 func (e *Evars) makeProjectsDir() (string, error) {
 	var buf bytes.Buffer
+	uniq := map[string]struct{}{}
 	err := filepath.WalkDir(e.pjdir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -112,6 +113,10 @@ func (e *Evars) makeProjectsDir() (string, error) {
 		if err != nil {
 			return nil
 		}
+		if _, ok := uniq[pj.Code()]; ok {
+			return errors.New("project code " + pj.Code() + " is duplicate in projects_dir")
+		}
+		uniq[pj.Code()] = struct{}{}
 		buf.WriteString(pj.DumpEvars() + "\n")
 		return nil
 	})
