@@ -22,6 +22,8 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
+
 	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -34,11 +36,11 @@ var runCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			// List available scripts
-			cmd.Println("Available Scripts:")
+			fmt.Println("Available Scripts:")
 			s := viper.GetStringMapString("scripts")
 			for _, v := range pjma.SortStringKeys(s) {
-				cmd.Println("  " + v)
-				cmd.Println("    " + s[v])
+				fmt.Println("  " + v)
+				fmt.Println("    " + s[v])
 			}
 			return
 		}
