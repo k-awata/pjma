@@ -23,6 +23,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"os/exec"
 
 	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
@@ -44,7 +46,29 @@ var runCmd = &cobra.Command{
 			}
 			return
 		}
-		rootCmd.Run(cmd, args)
+
+		// Read script
+		scrkey := "scripts." + args[0]
+		if !viper.IsSet(scrkey) {
+			cobra.CheckErr(fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath()))
+		}
+		scrval := append(pjma.ParseCommand(viper.GetString(scrkey)), args[1:]...)
+
+		// Run script
+		e := exec.Command(scrval[0], scrval[1:]...)
+		e.Stdin = os.Stdin
+		e.Stdout = os.Stdout
+		e.Stderr = os.Stderr
+		if err := e.Run(); err != nil {
+			cmd.Println(err)
+		}
+		os.Exit(e.ProcessState.ExitCode())
+	},
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return pjma.SortStringKeys(viper.GetStringMapString("scripts")), cobra.ShellCompDirectiveNoFileComp
 	},
 }
 

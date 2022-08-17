@@ -22,9 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"github.com/k-awata/pjma/pjma"
@@ -39,7 +37,7 @@ var rootCmd = &cobra.Command{
 	Use: `pjma script_name [args]...
   pjma`,
 	Short:   "Project manager for Aveva E3D Design and Administration",
-	Version: "1.1.1",
+	Version: "1.2.0",
 	Args:    cobra.MinimumNArgs(0),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -48,24 +46,9 @@ var rootCmd = &cobra.Command{
 			cmd.Help()
 			return
 		}
-
-		// Read script
-		scrkey := "scripts." + args[0]
-		if !viper.IsSet(scrkey) {
-			cobra.CheckErr(fmt.Errorf("unknown command %q for %q", args[0], cmd.CommandPath()))
-		}
-		scrval := append(pjma.ParseCommand(viper.GetString(scrkey)), args[1:]...)
-
-		// Run script
-		e := exec.Command(scrval[0], scrval[1:]...)
-		e.Stdin = os.Stdin
-		e.Stdout = os.Stdout
-		e.Stderr = os.Stderr
-		if err := e.Run(); err != nil {
-			cmd.Println(err)
-		}
-		os.Exit(e.ProcessState.ExitCode())
+		runCmd.Run(cmd, args)
 	},
+	ValidArgsFunction: runCmd.ValidArgsFunction,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
