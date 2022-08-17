@@ -39,7 +39,7 @@ var rootCmd = &cobra.Command{
 	Use: `pjma script_name [args]...
   pjma`,
 	Short:   "Project manager for Aveva E3D Design and Administration",
-	Version: "1.1.0",
+	Version: "1.1.1",
 	Args:    cobra.MinimumNArgs(0),
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
@@ -61,7 +61,9 @@ var rootCmd = &cobra.Command{
 		e.Stdin = os.Stdin
 		e.Stdout = os.Stdout
 		e.Stderr = os.Stderr
-		e.Run()
+		if err := e.Run(); err != nil {
+			cmd.Println(err)
+		}
 		os.Exit(e.ProcessState.ExitCode())
 	},
 }
