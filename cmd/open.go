@@ -81,6 +81,12 @@ var openCmd = &cobra.Command{
 		cmd.Println("Running app " + args[0] + "...")
 		cobra.CheckErr(lnchr.Run())
 	},
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return pjma.SortStringKeys(viper.GetStringMapString("apps")), cobra.ShellCompDirectiveNoFileComp
+	},
 }
 
 func init() {

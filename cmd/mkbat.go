@@ -53,6 +53,7 @@ var mkbatCmd = &cobra.Command{
 
 		fmt.Print(strings.ReplaceAll(lnchr.MakeBat(), "\n", "\r\n"))
 	},
+	ValidArgsFunction: openCmd.ValidArgsFunction,
 }
 
 func init() {
