@@ -78,6 +78,12 @@ var openCmd = &cobra.Command{
 			SetMacro(viper.GetString("context.macro"))
 
 		cobra.CheckErr(evars.Save())
+		cmd.Println("Module:", viper.GetString("context.module"))
+		cmd.Println("TTY Mode:", viper.GetBool("context.tty"))
+		cmd.Println("Project:", viper.GetString("context.project"))
+		cmd.Println("User:", viper.GetString("context.user"))
+		cmd.Println("MDB:", viper.GetString("context.mdb"))
+		cmd.Println("Macro:", viper.GetString("context.macro"))
 		cmd.Println("Running app " + args[0] + "...")
 		cobra.CheckErr(lnchr.Run())
 	},
