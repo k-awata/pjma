@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 const PROJECTS_DIR = "projects_dir"
@@ -59,7 +58,7 @@ func (e *Evars) AddAfterCmd(s string) {
 }
 
 // Save saves custom_evars.bat to projects_dir
-func (e *Evars) Save() error {
+func (e *Evars) Save(encode string) error {
 	if e.pjdir == "" {
 		return errors.New("projects_dir is not specified")
 	}
@@ -85,7 +84,11 @@ func (e *Evars) Save() error {
 		return err
 	}
 	defer file.Close()
-	if _, err := file.WriteString(strings.ReplaceAll(f+l+j+a, "\n", "\r\n")); err != nil {
+	bat, err := EncodeForBatch(f+l+j+a, encode)
+	if err != nil {
+		return err
+	}
+	if _, err := file.WriteString(bat); err != nil {
 		return err
 	}
 	return nil

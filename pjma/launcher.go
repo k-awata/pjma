@@ -116,7 +116,7 @@ func (l *Launcher) MakeBat() string {
 }
 
 // Run runs launcher bat file
-func (l *Launcher) Run() error {
+func (l *Launcher) Run(encode string) error {
 	f, err := os.CreateTemp("", "*.bat")
 	if err != nil {
 		return err
@@ -125,7 +125,11 @@ func (l *Launcher) Run() error {
 		f.Close()
 		os.Remove(f.Name())
 	}()
-	if _, err := f.WriteString(strings.ReplaceAll(l.MakeBat(), "\n", "\r\n")); err != nil {
+	bat, err := EncodeForBatch(l.MakeBat(), encode)
+	if err != nil {
+		return err
+	}
+	if _, err := f.WriteString(bat); err != nil {
 		return err
 	}
 	if err := exec.Command("cmd", "/c", f.Name()).Run(); err != nil {

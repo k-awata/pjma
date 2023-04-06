@@ -37,7 +37,7 @@ var evarsCmd = &cobra.Command{
 		cobra.CheckErr(evars.AddReferProjectDirs(viper.GetStringSlice("refer_pj")))
 		evars.AddJoinEnv(viper.GetStringMapStringSlice("join_env"))
 		evars.AddAfterCmd(viper.GetString("after_cmd"))
-		cobra.CheckErr(evars.Save())
+		cobra.CheckErr(evars.Save(viper.GetString("encoding")))
 		cmd.Println("pjma updated custom_evars.bat in projects_dir")
 	},
 }

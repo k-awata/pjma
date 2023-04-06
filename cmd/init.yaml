@@ -11,6 +11,7 @@ context:
   # password: ""
   # mdb: ""
   # macro: ""
+encoding: utf8
 projects_dir: projects\
 refer_pj:
   - C:\Users\Public\Documents\AVEVA\Projects\E3D3.1\AvevaCatalogue

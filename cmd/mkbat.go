@@ -23,7 +23,6 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/k-awata/pjma/pjma"
 	"github.com/spf13/cobra"
@@ -51,7 +50,9 @@ var mkbatCmd = &cobra.Command{
 			SetMdb(viper.GetString("context.mdb")).
 			SetMacro(viper.GetString("context.macro"))
 
-		fmt.Print(strings.ReplaceAll(lnchr.MakeBat(), "\n", "\r\n"))
+		bat, err := pjma.EncodeForBatch(lnchr.MakeBat(), viper.GetString("encoding"))
+		cobra.CheckErr(err)
+		fmt.Print(bat)
 	},
 	ValidArgsFunction: openCmd.ValidArgsFunction,
 }

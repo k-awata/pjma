@@ -3,6 +3,9 @@ package pjma
 import (
 	"bytes"
 	"sort"
+
+	"golang.org/x/text/encoding/htmlindex"
+	"golang.org/x/text/transform"
 )
 
 // SortStringKeys returns sorted keys from string map
@@ -67,4 +70,18 @@ func ParseCommand(cmd string) []string {
 		buf.WriteRune(r)
 	}
 	return append(param, buf.String())
+}
+
+// EncodeForBatch returns appropriate format string for batch files in specified encoding
+func EncodeForBatch(s string, encode string) (string, error) {
+	e, err := htmlindex.Get(encode)
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	w := transform.NewWriter(&buf, e.NewEncoder())
+	if _, err := w.Write(bytes.ReplaceAll([]byte(s), []byte("\n"), []byte("\r\n"))); err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }

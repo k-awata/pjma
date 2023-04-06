@@ -77,7 +77,7 @@ var openCmd = &cobra.Command{
 			SetMdb(viper.GetString("context.mdb")).
 			SetMacro(viper.GetString("context.macro"))
 
-		cobra.CheckErr(evars.Save())
+		cobra.CheckErr(evars.Save(viper.GetString("encoding")))
 		cmd.Println("Running app " + args[0] + "...")
 		cmd.Println("  Module:", viper.GetString("context.module"))
 		cmd.Println("  TTY Mode:", viper.GetBool("context.tty"))
@@ -85,7 +85,7 @@ var openCmd = &cobra.Command{
 		cmd.Println("  User:", viper.GetString("context.user"))
 		cmd.Println("  MDB:", viper.GetString("context.mdb"))
 		cmd.Println("  Macro:", viper.GetString("context.macro"))
-		cobra.CheckErr(lnchr.Run())
+		cobra.CheckErr(lnchr.Run(viper.GetString("encoding")))
 	},
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) != 0 {
